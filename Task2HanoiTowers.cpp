@@ -6,8 +6,8 @@ int carry(int n, int a, int b, int c) {
 	counter++;                                   // учитываем сравнение
 	if (n == 1) {
 		//printf("%i -> %i\n", a, b); 
-		counter++;                               // учитываем перекладывание
-		counter++;                               // учитываем return
+		counter++;                           // учитываем перекладывание
+		counter++;                           // учитываем return
 		return counter;
 	}
 	counter += 1 + 1 + carry(n - 1, a, c, b);    // учитываем вычитание, вызов функции и значение функции
