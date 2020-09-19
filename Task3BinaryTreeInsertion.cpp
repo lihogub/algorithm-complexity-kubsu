@@ -1,8 +1,6 @@
-#include <ctime>
 #include <stdio.h>
 #include <random>
-using namespace std;
-
+#include <ctime>
 
 struct node {
     int value;
@@ -10,104 +8,100 @@ struct node {
     node* right = NULL;
 };
 
-
-void remove_binary_tree(node* node_ptr) {
-    if (node_ptr == NULL) return;
-    remove_binary_tree(node_ptr->left);
-    remove_binary_tree(node_ptr->right);
-    delete node_ptr;
+int* sum(int* arr1, int* arr2, int n) {
+    for (int i = 0; i < n; i++) {
+        arr1[i] += arr2[i];
+    }
+    delete[] arr2;
+    return arr1;
 }
 
-int insert_to_binary_tree(int value, node* node_ptr) {
+double* divide(int* arr, int n, int divisor) {
+    double* result = new double[n];
+    for (int i = 0; i < n; i++) {
+        result[i] = 1.0 * arr[i] / divisor;
+    }
+    delete[] arr;
+    return result;
+}
+
+void remove_tree(node* tree) {
+    if (tree == NULL) return;
+    remove_tree(tree->left);
+    remove_tree(tree->right);
+    delete tree;
+}
+
+int add_to_tree(node* tree, int value) {
     int counter = 0;
     counter++;
-    if (node_ptr->value == value) 
-        return counter;
+    if (tree->value == value) return counter;
     counter++;
-    if (node_ptr->value < value) {
+    if (tree->value > value) {
         counter++;
-        if (node_ptr->left) 
-            return counter + insert_to_binary_tree(value, node_ptr->left);
-        node_ptr->left = new node; counter++;
-        node_ptr->left->value = value; counter++;
+        if (tree->right) return counter + add_to_tree(tree->right, value);
+        tree->right = new node; counter++;
+        tree->right->value = value; counter++;
         return counter;
     }
-    counter++;
-    if (node_ptr->right) 
-        return counter + insert_to_binary_tree(value, node_ptr->right);
-    node_ptr->right = new node; counter++;
-    node_ptr->right->value = value; counter++;
+    if (tree->left) return counter + add_to_tree(tree->left, value);
+    tree->left = new node; counter++;
+    tree->left->value = value; counter++;
     return counter;
 }
 
-int* test_rand_tree(int n) {
+int* make_test(int n) {
+    int* stats = new int[n];
     node* root = new node;
     root->value = rand();
-    int* stats = new int[n];
-    stats[0] += 1;
-
+    stats[0] = 2;
     for (int i = 1; i < n; i++) {
-        stats[i] += insert_to_binary_tree(rand(), root);
+        stats[i] = add_to_tree(root, rand());
     }
-    remove_binary_tree(root);
+    remove_tree(root);
     return stats;
 }
 
-int* test_ordered_tree(int n) {
-    node* root = new node;
-    root->value = rand();
-
+int* get_summary(int n, int iterations) {
     int* stats = new int[n];
-    stats[0] = 1;
-
-    for (int i = 1; i < n; i++) {
-        stats[i] = insert_to_binary_tree(i+1, root);
+    std::fill(stats, stats + n, 0);
+    for (int i = 0; i < iterations; i++) {
+        if (i % (iterations / 100) == 0) printf("%0.1f%\n", (100.0 * i / iterations));
+        stats = sum(stats, make_test(n), n);
     }
-    remove_binary_tree(root);
     return stats;
+}
+
+double* get_avg_stats(int n, int iterations) {
+    return divide(get_summary(n, iterations), n, iterations);
 }
 
 void show_arr(int* arr, int n) {
-    for (int i = 0; i < n; i++) 
-        printf("%i %i\n", i+1, arr[i]);
+    for (int i = 0; i < n; i++) {
+        printf("%i %i\n", (i+1), arr[i]);
+    }
 }
-
 
 void show_arr(double* arr, int n) {
-    for (int i = 0; i < n; i++) 
-        printf("%i %f\n", i+1, arr[i]);
-}
-
-int max_tree_depth(node* node_ptr) {
-    if (node_ptr == NULL) return 0;
-    int left_d = max_tree_depth(node_ptr->left);
-    int right_d = max_tree_depth(node_ptr->right);
-    int max_d = left_d > right_d ? left_d : right_d;
-    return max_d > 1 ? max_d : 1;
-}
-
-double* test_drive(int n, int iterations) {
-    double* total_stats = new double[n];
-    fill(total_stats, total_stats+n, 0);
-    for (int i = 0; i < iterations; i++) {
-        //if ((i+1) % (iterations / 100) == 0) printf("%0.1f%\n", 100.0*(i+1)/iterations);
-        int* stats = test_rand_tree(n);
-        for (int j = 0; j < n; j++) {
-            total_stats[j] += stats[j];
-        }
-        delete[] stats;
-    }
-    
     for (int i = 0; i < n; i++) {
-        total_stats[i] /= iterations;
+        printf("%i %f\n", (i+1), arr[i]);
     }
-    
-    return total_stats;
+    delete[] arr;
+}
+
+void compare(double* arr, int n, double f (int n)) {
+    for (int i = 0; i < n; i++) {
+        printf("%i %f %f %f\n", (i+1), arr[i], f(i+1), arr[i]/f(i+1));
+    }
+    delete[] arr;
+}
+
+double approx_function(int n) {
+    return 2.74079*log2(n) + 0.06016*n + 1.93983;
 }
 
 int main() {
-    srand(time(0));
     int n = 20;
-    show_arr(test_drive(n, 1000), n);
+    compare(get_avg_stats(n, 10000000), n, approx_function);
     return 0;
 }
