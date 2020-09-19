@@ -81,22 +81,24 @@ int max_tree_depth(node* node_ptr) {
 }
 
 double* test_drive(int n, int iterations) {
-    int* stats = new int[n];
+    int* total_stats = new int[n];
+    fill(total_stats, total_stats+n, 0);
     double* results = new double[n];
     for (int i = 0; i < iterations; i++) {
-        test_ordered_tree(n);
+        int* stats = test_ordered_tree(n);
+        for (int i = 0; i < n; i++) {
+            total_stats[i] += stats[i];
+        }
     }
     for (int i = 0; i < n; i++) {
-        results[i] = 1.0*stats[i] / iterations;
+        results[i] = 1.0*total_stats[i]/iterations;
     }
     return results;
 }
 
 int main() {
     srand(time(0));
-    int n = 20;
-    show_arr(test_drive(n, 1000), n);
-
-
+    int n = 1000;
+    show_arr(test_drive(n, 100000), n);
     return 0;
 }
