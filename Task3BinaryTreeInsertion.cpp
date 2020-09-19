@@ -101,6 +101,7 @@ double approx_function(int n) {
 }
 
 int main() {
+    srand(time(0));
     int n = 20;
     compare(get_avg_stats(n, 10000000), n, approx_function);
     return 0;
