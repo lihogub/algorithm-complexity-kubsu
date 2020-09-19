@@ -50,7 +50,7 @@ int add_to_tree(node* tree, int value) {
     return counter;
 }
 
-int* make_test(int n) {
+int* make_random_tree(int n) {
     int* stats = new int[n];
     node* root = new node;
     root->value = rand();
@@ -62,18 +62,30 @@ int* make_test(int n) {
     return stats;
 }
 
-int* get_summary(int n, int iterations) {
+int* make_non_random_tree(int n) {
+    int* stats = new int[n];
+    node* root = new node;
+    root->value = 1;
+    stats[0] = 2;
+    for (int i = 1; i < n; i++) {
+        stats[i] = add_to_tree(root, i+1);
+    }
+    remove_tree(root);
+    return stats;
+}
+
+int* get_summary(int n, int iterations, int* tree_making_func(int)) {
     int* stats = new int[n];
     std::fill(stats, stats + n, 0);
     for (int i = 0; i < iterations; i++) {
         if (i % (iterations / 100) == 0) printf("%0.1f%\n", (100.0 * i / iterations));
-        stats = sum(stats, make_test(n), n);
+        stats = sum(stats, tree_making_func(n), n);
     }
     return stats;
 }
 
-double* get_avg_stats(int n, int iterations) {
-    return divide(get_summary(n, iterations), n, iterations);
+double* get_avg_stats(int n, int iterations, int* tree_making_func(int)) {
+    return divide(get_summary(n, iterations, tree_making_func), n, iterations);
 }
 
 void show_arr(int* arr, int n) {
@@ -89,20 +101,26 @@ void show_arr(double* arr, int n) {
     delete[] arr;
 }
 
-void compare(double* arr, int n, double f (int n)) {
+void compare(double* arr, int n, double f (int)) {
     for (int i = 0; i < n; i++) {
         printf("%i %f %f %f\n", (i+1), arr[i], f(i+1), arr[i]/f(i+1));
     }
     delete[] arr;
 }
 
-double approx_function(int n) {
+double random_approx_function(int n) {
     return 2.74079*log2(n) + 0.06016*n + 1.93983;
+}
+
+double non_random_approx_function(int n) {
+    return 2.0*n;
 }
 
 int main() {
     srand(time(0));
     int n = 20;
-    compare(get_avg_stats(n, 10000000), n, approx_function);
+    compare(get_avg_stats(n, 100000, make_non_random_tree), n, non_random_approx_function);
+    scanf("%i");
+    compare(get_avg_stats(n, 100000, make_non_random_tree), n, random_approx_function);
     return 0;
 }
