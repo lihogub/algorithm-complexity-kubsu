@@ -50,13 +50,13 @@ int* make_random_connected_graph(int size) {
 int goFrom(int source_vertice, int vertice_count, int* graph, int* passed_vertices, int verbose) {
     int counter = 0;
     counter++;
-    passed_vertices[source_vertice] = 1; 
+    passed_vertices[source_vertice] = 1;
     for (int i = 0; i < vertice_count; i++) {
         counter += 4;
         if ((!passed_vertices[i]) && graph[source_vertice*vertice_count + i]) {
         if (verbose) printf("%i %i\n", source_vertice, i);
         counter += goFrom(i, vertice_count, graph, passed_vertices, verbose);
-        }      
+        }
     }
     return counter;
 }
@@ -65,7 +65,7 @@ int test_drive(int size) {
     int* graph = make_random_connected_graph(size);
     int* passed_vertices = new int[size];
     std::fill(passed_vertices, passed_vertices+size, 0);
-    int operations = goFrom(0, size, graph, passed_vertices, 1);
+    int operations = goFrom(0, size, graph, passed_vertices, 0);
     delete[] graph;
     delete[] passed_vertices;
     return operations;
@@ -73,8 +73,9 @@ int test_drive(int size) {
 
 int main() {
     srand(time(0));
-    printf("%i\n", test_drive(10000));
-    
+    int n = 20;
+    for (int i = 1; i <= n; i++)
+        printf("%i %i %i\n", i, test_drive(i), 4*i*i+i);
 
     return 0;
 }
