@@ -193,9 +193,6 @@ void getStats(int lower_bound, int upper_bound) {
     }
 }
 
-
-
-
 int main() {
     srand(time(0));
     
