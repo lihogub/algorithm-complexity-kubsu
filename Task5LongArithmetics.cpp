@@ -1,195 +1,205 @@
-#include <stdio.h>
+#include <iostream>
 #include <random>
+#include <math.h>
+using namespace std;
 
-struct longNumNode{
-    int value;
-    longNumNode *next = 0;
-    longNumNode *prev = 0;
-    longNumNode(int val) {
-        value = val;
-    }
-};
+int global_counter = 0;
 
 struct longNum{
-    int length = 0;
-    longNumNode* root = 0;
-    longNumNode* tail = 0;
-    longNum() {}
-    longNum(int value) {
-        root = new longNumNode(value);
-        tail = root;
-        length = 1;
-    }
+    int* arr;
+    int length;
 };
 
 int max(int a, int b) {
     if (a > b) return a;
-    else b;
+    return b;
 }
 
-longNum* addCharToRight(longNum* node, int value) {
-    node->length++;
-    node->tail->next = new longNumNode(value);
-    node->tail->next->prev = node->tail;
-    node->tail = node->tail->next; 
-    return node;
+int min(int a, int b) {
+    if (a < b) return a;
+    return b;
 }
 
-longNum* addCharToLeft(longNum* node, int value) {
-    node->length++;
-    node->root->prev = new longNumNode(value);
-    node->root->prev->next = node->root;
-    node->root = node->root->prev;
-    return node;
-}
-
-
-int char_to_int(char c) {
-    return (int)c - 48;
-}
-
-void printLR(longNum* num) {
-    longNumNode* node = num->root;
-    while (node) {
-        printf("%i", node->value);
-        node = node->next;
-    }
-    printf("\n");
-}
-
-void printRL(longNum* num) {
-    longNumNode* node = num->tail;
-    while (node) {
-        printf("%i", node->value);
-        node = node->prev;
-    }
-    printf("\n");
+int freeLongNum(longNum* num) {
+    if (!num) return 0;
+    if (!num->arr) return 0;
+    delete[] num->arr;
+    return 0;
 }
 
 longNum* sum(longNum* a, longNum* b) {
-    longNumNode* an = a->root;
-    longNumNode* bn = b->root;
-    int tmp = 0;
-    tmp += an->value;
-    tmp += bn->value;
-    longNum* c = new longNum(tmp%10);
-    tmp /= 10;
-    an = an->next;
-    bn = bn->next;
-    while (an || bn || tmp) {
-        if(an) tmp += an->value;
-        if(bn) tmp += bn->value;
-        addCharToRight(c, tmp%10);
-        tmp /= 10;
-        if (an) an = an->next;
-        if (bn) bn = bn->next;
+    longNum* c = new longNum;                               global_counter++;
+    c->arr = new int[max(a->length, b->length) + 1];        global_counter += 2;
+    int length = 0;                                         global_counter++;
+    int tmp = 0;                                            global_counter++;
+    int a_ptr, b_ptr, c_ptr;                                global_counter += 3;
+    a_ptr = b_ptr = c_ptr = 0;                              global_counter += 3;
+                                                            global_counter += 4;
+    while (a_ptr < a->length || b_ptr < b->length || tmp) {
+                                                           global_counter += 4;
+                                                           global_counter++;
+        if (a_ptr < a->length) { tmp += a->arr[a_ptr];     global_counter += 2;}
+                                                           global_counter++;
+        if (b_ptr < b->length) { tmp += b->arr[b_ptr];     global_counter += 2;}
+        c->arr[c_ptr] = tmp%10;                            global_counter += 2;
+        c_ptr++;                                           global_counter += 2;
+        tmp /= 10;                                         global_counter += 2;
+                                                           global_counter++;
+        if (a_ptr < a->length) {a_ptr++;                   global_counter += 2;}
+                                                           global_counter++;
+        if (b_ptr < b->length) {b_ptr++;                   global_counter += 2;}
     }
+    c->length = c_ptr;                                     global_counter++;
     return c;
 }
 
-longNum* extendToNearestPowerOfTwo(longNum* num) {
-    int size = 1;
-    while (size < num->length) size *= 2;
-    for (int i = num->length; i < size; i++) {
-        addCharToRight(num, 0);
+longNum* stringToLongNum(string s) {
+    longNum* result = new longNum;
+    result->length = s.length();
+    result->arr = new int[s.length()];
+    for (int i = 0; i < s.length(); i++) {
+        result->arr[s.length() - 1 - i] = (int)s.at(i) - 48;
     }
-    return num;
+    return result;
+}
+
+void printLR(longNum* num) {
+    for (int i = 0; i < num->length; i++) {
+        cout << num->arr[i];
+    }
+    cout << endl;
+}
+
+void printRL(longNum* num) {
+    int meaningful = 0;
+    for (int i = num->length - 1; i >= 0; i--) {
+        if (num->arr[i] || meaningful) {
+            cout << num->arr[i];
+            meaningful = 1;
+        }
+    }
+    if (!meaningful) cout << 0;
+    cout << endl;
 }
 
 longNum* split(longNum* num) {
-    longNum* result = new longNum[2];
-    result[0].length = num->length / 2;
-    result[1].length = num->length / 2;
-    result[0].root = num->root;
-    result[1].tail = num->tail;
-    longNumNode* tmp;
-    tmp = num->root; 
-    for (int i = 0; i < num->length / 2 - 1; i++) tmp = tmp->next;
-    tmp->next = 0;
-    result[0].tail = tmp;
-    tmp = num->tail; 
-    for (int i = 0; i < num->length / 2 - 1; i++) tmp = tmp->prev;
-    tmp->prev = 0;
-    result[1].root = tmp;
+    longNum* result = new longNum[2];                                                           global_counter++;
+    result[0].length = num->length / 2;                                                         global_counter += 2;
+    result[1].length = num->length / 2;                                                         global_counter += 2; 
+    result[0].arr = new int[result[0].length];                                                  global_counter++;
+    result[1].arr = new int[result[1].length];                                                  global_counter++;
+    for (int i = 0; i < num->length / 2; i++) {result[0].arr[i] = num->arr[i];                  global_counter++;}
+    for (int i = 0; i < num->length / 2; i++) {result[1].arr[i] = num->arr[num->length / 2 + i]; global_counter += 3;}
     return result;
 }
 
-void equalizeLength(longNum* a, longNum* b) {
-    extendToNearestPowerOfTwo(a);
-    extendToNearestPowerOfTwo(b);
-    while (a->length != b->length) {
-        if (a->length > b->length) {
-            addCharToRight(b, 0);
-            extendToNearestPowerOfTwo(b);
-        }
-        else{
-            addCharToRight(a, 0);
-            extendToNearestPowerOfTwo(a);
-        }
-    }
-
-}
-
-longNum* multiplyElem(longNum* num, longNum* value) {
-    longNumNode* current = num->root;
-    int tmp = 0;
-    tmp += current->value * value->root->value;
-    longNum* result = new longNum(tmp%10);
-    tmp /= 10;
-    current = current->next;
-    while (current || tmp) {
-        if (current) tmp += current->value * value->root->value;
-        addCharToRight(result, tmp%10);
-        tmp /= 10;
-        if (current) current = current->next;
-    }
+longNum* multiplyElementary(longNum* U, longNum* V) {
+    longNum* result = new longNum;                                              global_counter++;
+    result->arr = new int[1];                                                   global_counter++;
+    result->arr[0] = U->arr[0]*V->arr[0];                                       global_counter += 2;
+    result->length = 1;                                                         global_counter++;
     return result;
 }
 
-longNum* power_of_ten(int n) {
-    longNum* result = new longNum(1);
-    for (int i = 0; i < n; i++) addCharToLeft(result, 0);
+int nearestSize(longNum* a, longNum* b) {
+    int max_length = max(a->length, b->length);                                 global_counter++;
+    int target_length = pow(2, ceil(log2(max_length)));                         global_counter += 4;
+    return target_length;
+}
+
+longNum* extendTo(longNum* num, int length) {
+                                                                                global_counter++;
+    if (num->length == length) return num;
+    longNum* result = new longNum;                                              global_counter++;
+    result->length = length;                                                    global_counter++;
+    result->arr = new int[length];                                              global_counter++;
+    for (int i = 0; i < num->length; i++) {result->arr[i] = num->arr[i];        global_counter++;}
+    for (int i = num->length; i < length; i++) {result->arr[i] = 0;             global_counter++;}
     return result;
 }
 
-longNum* multiply(longNum* U, longNum* V){
-    equalizeLength(U, V);
-    if (U->length == 1 && V->length == 1) {
-        printf("0");
-        longNum* result = new longNum(V->root->value*U->root->value % 10);
-        addCharToRight(result, V->root->value*U->root->value / 10);
-        return result;
-    }
-    if (U->length > 1 && V->length == 1) {
-        printf("1");
-        return multiplyElem(U, V);
-    }
-    if (V->length > 1 && U->length == 1) {
-        printf("2");
-        return multiplyElem(V, U);
-    }
-    int current_length = U->length;
-    longNum* U_arr = split(U);
-    longNum* V_arr = split(V);
-    longNum* s = new longNum(0);
-    s = sum(s, multiply(multiply(&U_arr[1], &V_arr[1]), power_of_ten(current_length)));
-    s = sum(s, multiply(multiply(&U_arr[1], &V_arr[0]), power_of_ten(current_length/2)));
-    s = sum(s, multiply(multiply(&U_arr[0], &V_arr[1]), power_of_ten(current_length/2)));
-    s = sum(s, multiply(&U_arr[0], &V_arr[0]));
-    return s;
+longNum* powerize(longNum* num, int power) {
+    longNum* result = new longNum;                                              global_counter++;
+    result->arr = new int[num->length + power];                                 global_counter += 2;
+    for (int i = 0; i < power; i++) {result->arr[i] = 0;                        global_counter++;}
+    for (int i = 0; i < num->length; i++) {result->arr[power + i] = num->arr[i]; global_counter += 2;}
+    result->length = num->length + power;                                       global_counter += 2;  
+    return result;
 }
+
+longNum* multiply(longNum* U, longNum* V) {
+    int nearest_common_length = nearestSize(U, V);                              global_counter++;
+                                                                                global_counter++;
+    if (nearest_common_length == 1) return multiplyElementary(U, V);
+    U = extendTo(U, nearest_common_length);                                     global_counter++;
+    V = extendTo(V, nearest_common_length);                                     global_counter++;
+    longNum* U2U1 = split(U);                                                   global_counter++;
+    longNum* V2V1 = split(V);                                                   global_counter++;
+    
+    longNum* U2 = &U2U1[0];                                                     global_counter++;
+    longNum* U1 = &U2U1[1];                                                     global_counter++;
+    longNum* V2 = &V2V1[0];                                                     global_counter++;
+    longNum* V1 = &V2V1[1];                                                     global_counter++;
+
+    longNum* U1V1 = multiply(U1, V1);
+    longNum* U2V1 = multiply(U2, V1);
+    longNum* U1V2 = multiply(U1, V2);
+    longNum* U2V2 = multiply(U2, V2);
+    freeLongNum(U1);
+    freeLongNum(U2);
+    freeLongNum(V1);
+    freeLongNum(V2);
+    longNum* U1V1Beta = powerize(U1V1, nearest_common_length);
+    freeLongNum(U1V1);
+    longNum* U2V1BetaHalf = powerize(U2V1, nearest_common_length / 2);
+    freeLongNum(U2V1);
+    longNum* U1V2BetaHalf = powerize(U1V2, nearest_common_length / 2);
+    freeLongNum(U1V2);
+    longNum* result1 = sum(U1V1Beta, U2V1BetaHalf);
+    freeLongNum(U1V1Beta);
+    freeLongNum(U2V1BetaHalf);
+    longNum* result2 = sum(U1V2BetaHalf, U2V2);
+    freeLongNum(U1V2BetaHalf);
+    freeLongNum(U2V2);
+    longNum* result = sum(result1, result2);
+    freeLongNum(result1);
+    freeLongNum(result2);
+    return result;
+}
+
+longNum* generateLongNum(int length) {
+    string s = "";
+    for (int i = 0; i < length; i++)
+        s.push_back(rand() % 10);
+    return stringToLongNum(s);
+}
+
+int testDrive(int length) {
+    global_counter = 0;
+    longNum* num1 = generateLongNum(length);
+    longNum* num2 = generateLongNum(length);
+    multiply(num1, num2);
+    return global_counter;
+}
+
+double approx(int n) {
+    return 201.807 * n * n + 10.538 * n * log2(n) - 189.807 * n;
+}
+
+void getStats(int lower_bound, int upper_bound) {
+    for (int i = lower_bound; i <= upper_bound; i += 1) {
+        int ops = testDrive(i);
+        cout << i << " " << ops << " " << approx(i) << " " << ops / approx(i) << endl;
+    }
+}
+
 
 
 
 int main() {
-    longNum* num1 = new longNum(6);
-    for (int i = 1; i < 6; i++) addCharToRight(num1, i%10);
+    srand(time(0));
+    
+    getStats(1, 128);
 
-    longNum* num2 = new longNum(6);
-    for (int i = 1; i < 3; i++) addCharToRight(num2, i%10);
-
-    printLR(num1);
-    printLR(num2);
-    printLR(multiply(num1, num2));
     return 0;
- }
+}
