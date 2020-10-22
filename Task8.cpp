@@ -5,7 +5,7 @@ using namespace std;
 
 unsigned long long counter;
 
-void C(int a = 1) {
+void C(unsigned long long a = 1) {
     counter += a;
 }
 
@@ -113,9 +113,9 @@ Disjunctor* getResolvent(Disjunctor *a, Disjunctor *b) {
 
 
 void print(vector<Disjunctor*> &disjList) {
+    cout << disjList.size() << endl;
     for (auto item : disjList) 
-        cout << "( " << item->first << ", " << item->second << ")" << " ";
-    cout << endl;
+        cout << item->first << " " << item->second << endl;
 }
 
 bool isResolvable(int leftIndex, int rightIndex, vector<Disjunctor*> &disjList) {
@@ -170,19 +170,21 @@ void addNUniqDisjToList(vector<Disjunctor*> &disjList, int disjCount, int maxVal
     }
 }
 
-int doTest(int disjCount, int maxLiteralIndex) {
+unsigned long long doTest(int disjCount, int maxLiteralIndex) {
     counter = 0;
     vector <Disjunctor*> v;
-    addNUniqDisjToList(v, disjCount, 1000);
-    isResolvable(0, disjCount - 1, v);
+    addNUniqDisjToList(v, disjCount, maxLiteralIndex);
+    print(v);
+    cout << isResolvable(0, disjCount - 1, v) << endl;
     return counter;
 }
 
 
 int main() {
     srand(time(0));
-    cout << doTest(10000, 10000) << endl;
 
+
+    cout << doTest(10000, 10000) << endl;
 
     return 0;
 }
