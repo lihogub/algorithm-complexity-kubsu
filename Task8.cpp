@@ -95,7 +95,7 @@ void addDisjPair(pair<int, int> &disjPair, vector<pair<int, int>> &disjList, set
     disjList.push_back(disjPair);
     C(LOG_N);
     disjSet.insert(disjPair);
-    cout << disjList.size() << " " << counter << endl;
+    //cout << disjList.size() << " " << counter << endl;
 }
 
 void print(vector<pair<int, int>> &disjList) {
@@ -137,7 +137,7 @@ bool isResolvable(int leftIndex, int rightIndex, vector<pair<int, int>> &disjLis
                 continue;
             addDisjPair(resolventDisjPair, disjList, disjSet);
         }
-    printInLine(disjList);
+    //printInLine(disjList);
     return isResolvable(rightIndex + 1, disjList.size() - 1, disjList, disjSet);
 }
 
@@ -161,16 +161,31 @@ void addNUniqDisjToList(vector<pair<int, int>> &disjList, set<pair<int, int>> &d
     }
 }
 
-int main() {
-    srand(time(0));
-    LOG_N = (int)floor(log2(10));
+int doTest(int n) {
+    LOG_N = (int)floor(log2(n));
     vector <pair<int, int>> v;
     set <pair<int, int>> s;
-    addNUniqDisjToList(v, s, 10, 10);
+    addNUniqDisjToList(v, s, n, n);
     counter = 0;
-    cout << isResolvable(0, 9, v, s) << endl;
-    cout << counter << endl;
-    return 0;
+    isResolvable(0, n-1, v, s);
+    return counter;
 }
 
+long double getStats(int n, int iterations) {
+    unsigned long long s = 0;
+    for (int i = 1; i < iterations; i++) {
+        s += doTest(n);
+    }
+    return s/iterations; 
 
+}
+
+int main() {
+    srand(time(0));
+    for (int i = 650; i <= 1000; i+=25) {
+        cout << i << ";" << (int)floor(getStats(i, 100)) << endl;
+    }
+
+
+    return 0;
+}
