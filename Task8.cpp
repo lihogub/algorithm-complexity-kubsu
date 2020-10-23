@@ -1,12 +1,15 @@
 #include <iostream>
 #include <vector>
+#include <set>
 #include <ctime>
+#include <math.h>
 using namespace std;
 
 unsigned long long counter;
+unsigned long long LOG_N;
 
-void C(unsigned long long a = 1) {
-    counter += a;
+inline void C(int i) {
+    counter += i;
 }
 
 inline void swap(int &a, int &b) {
@@ -16,90 +19,67 @@ inline void swap(int &a, int &b) {
     b = tmp;
 }
 
-struct Disjunctor {
-    int first;
-    int second;
-
-    Disjunctor() {
-        Disjunctor(0, 0);
+pair<int, int> makeDisjPair(int a, int b) {
+    C(1);
+    if (a == b) { 
+        C(1);
+        a = 0;
     }
+    C(1);
+    if (a > b) 
+        swap(a, b);
+    C(1);
+    return make_pair(a, b);
+}
 
-    Disjunctor(int a, int b) {
-        C(5);
-        if (a == b) 
-            a = 0;
-        if (a > b) 
-            swap(a, b);
-        this->first = a;
-        this->second = b;
-    }
-
-    bool isExceptional() {
-        C(2);
-        if ((this->first + this->second) == 0)
-            return true;
-        return false;
-    }
-
-    bool isEqualTo(Disjunctor *d) {
-        C(2);
-        if (this->first == d->first && this->second == d->second) return true;
-        C(2);
-        if (this->first == d->second && this->second == d->first) return true;
-        return false;
-    }
-
-    int getContraryDirection(Disjunctor *d) {
-        C(2);
-        if (this->first == -d->first) return 1;
-        C(2);
-        if (this->first == -d->second) return 2;
-        C(2);
-        if (this->second == -d->first) return 3;
-        C(2);
-        if (this->second == -d->second) return 4;
-        return 0;
-    }
-
-};
-
-bool isDuplicate(Disjunctor *disj, vector<Disjunctor*> &disjList) {
-    for (int i = 0; i < disjList.size(); i++) {
-        C();
-        if (disj->isEqualTo(disjList[i])) 
-            return true;
-    }
+bool isExceptional(pair<int, int> &disjPair) {
+    C(2);
+    if ((disjPair.first + disjPair.second) == 0)
+        return true;
     return false;
 }
 
-Disjunctor* getResolvent(Disjunctor *a, Disjunctor *b) {
-    C();
-    int contraryDirection = a->getContraryDirection(b);
-    C();
-    if (contraryDirection == 0) 
-        return 0;
-    C(2);
+int getCountraryDirection(pair<int, int> &disjPairA, pair<int, int> &disjPairB) {
+    C(1);
+    if (disjPairA.first == -disjPairB.first) return 1;
+    C(1);
+    if (disjPairA.first == -disjPairB.second) return 2;
+    C(1);
+    if (disjPairA.second == -disjPairB.first) return 3;
+    C(1);
+    if (disjPairA.second == -disjPairB.second) return 4;
+    return 0;
+}
+
+bool isDuplicate(pair<int, int> &disjPair, set<pair<int, int>> &disjSet) {
+    C(LOG_N + 1);
+    if (disjSet.count(disjPair) > 0)
+        return true;
+    return false;
+}
+
+pair<int, int> getResolventDisjPair(int countraryDirection, pair<int, int> &disjPairA, pair<int, int> &disjPairB) {
+    C(8);
     int new_first, new_second;
-    C(6);
-    switch (contraryDirection) {
+    switch (countraryDirection) {
         case 1: {
-            new_first = a->second;
-            new_second = b->second;
+            new_first = disjPairA.second;
+            new_second = disjPairB.second;
             break;
         }
         case 2: {
-            new_first = a->second;
-            new_second = b->first;
+            new_first = disjPairA.second;
+            new_second = disjPairB.first;
             break;
         }
         case 3: {
-            new_first = a->first;
-            new_second = b->second;
+            new_first = disjPairA.first;
+            new_second = disjPairB.second;
             break;
         }
         case 4: {
-            new_first = a->first;
-            new_second = b->first;
+            new_first = disjPairA.first;
+            new_second = disjPairB.first;
             break;
         }
         default: {
@@ -107,85 +87,89 @@ Disjunctor* getResolvent(Disjunctor *a, Disjunctor *b) {
             exit(-1);
         }
     }
-    C();
-    return new Disjunctor(new_first, new_second);  
+    return makeDisjPair(new_first, new_second);
 }
 
+void addDisjPair(pair<int, int> &disjPair, vector<pair<int, int>> &disjList, set<pair<int, int>> &disjSet) {
+    C(LOG_N);
+    disjList.push_back(disjPair);
+    C(LOG_N);
+    disjSet.insert(disjPair);
+    cout << disjList.size() << " " << counter << endl;
+}
 
-void print(vector<Disjunctor*> &disjList) {
-    cout << disjList.size() << endl;
+void print(vector<pair<int, int>> &disjList) {
     for (auto item : disjList) 
-        cout << item->first << " " << item->second << endl;
+        cout << item.first << " " << item.second << endl;
 }
 
-bool isResolvable(int leftIndex, int rightIndex, vector<Disjunctor*> &disjList) {
-    C();
+
+void printInLine(vector<pair<int, int>> &disjList) {
+    for (auto item : disjList) 
+        cout << "(" << item.first << " " << item.second << ") ";
+    cout << endl;
+}
+
+void print(set<pair<int, int>> &disjSet) {
+    for (auto item : disjSet) 
+        cout << item.first << " " << item.second << endl;
+}
+
+bool isResolvable(int leftIndex, int rightIndex, vector<pair<int, int>> &disjList, set<pair<int, int>> &disjSet) {
+    C(1);
     if (leftIndex > rightIndex) return true;
-    C();
-    Disjunctor* tmpDisj;
+    C(2);
+    int countraryDirection;
+    pair<int, int> resolventDisjPair;
+
     for (int elderItemIndex = rightIndex; leftIndex <= elderItemIndex; elderItemIndex--) 
         for (int youngerItemIndex = elderItemIndex - 1; 0 <= youngerItemIndex; youngerItemIndex--) {
-            C();
-            tmpDisj = getResolvent(disjList[elderItemIndex], disjList[youngerItemIndex]);
-            C();
-            if (tmpDisj == 0) {
-                delete tmpDisj;
-                continue; 
-            }
-            C();
-            if (tmpDisj->isExceptional()) 
-                return false;
-            C();
-            if (isDuplicate(tmpDisj, disjList)) { 
-                delete tmpDisj;
+            C(2);
+            if ((countraryDirection = getCountraryDirection(disjList[elderItemIndex], disjList[youngerItemIndex])) == 0)
                 continue;
-            }
-            C();
-            disjList.push_back(tmpDisj);
+            C(1);
+            resolventDisjPair = getResolventDisjPair(countraryDirection, disjList[elderItemIndex], disjList[youngerItemIndex]);
+            C(1);
+            if (isExceptional(resolventDisjPair)) 
+                return false;
+            C(1);
+            if (isDuplicate(resolventDisjPair, disjSet)) 
+                continue;
+            addDisjPair(resolventDisjPair, disjList, disjSet);
         }
-    //print(disjList);
-    return isResolvable(rightIndex + 1, disjList.size() - 1, disjList);
+    printInLine(disjList);
+    return isResolvable(rightIndex + 1, disjList.size() - 1, disjList, disjSet);
 }
 
-Disjunctor* getRandDisj(int maxValue) {
+
+pair<int, int> getRandDisj(int maxValue) {
     int a, b;
     do {
         a = (rand() % (2 * maxValue) + 1) - maxValue; 
         b = (rand() % (2 * maxValue) + 1) - maxValue; 
     } while ((a + b) == 0);
-    return new Disjunctor(a, b);
+    return makeDisjPair(a, b);
 }
 
-void addDisj(int a, int b, vector<Disjunctor*> &disjList) {
-    disjList.push_back(new Disjunctor(a, b));
-}
-
-void addNUniqDisjToList(vector<Disjunctor*> &disjList, int disjCount, int maxValue) {
+void addNUniqDisjToList(vector<pair<int, int>> &disjList, set<pair<int, int>> &disjSet, int disjCount, int maxValue) {
     for (int i = 0; i < disjCount; i++) {
-        Disjunctor* tmp = 0;
+        pair <int, int> tmpDisjPair;
         do {
-            tmp = getRandDisj(maxValue);
-        } while (isDuplicate(tmp, disjList) || tmp->isExceptional());
-        disjList.push_back(tmp);
+            tmpDisjPair = getRandDisj(maxValue);
+        } while (isDuplicate(tmpDisjPair, disjSet));
+        addDisjPair(tmpDisjPair, disjList, disjSet);
     }
 }
 
-unsigned long long doTest(int disjCount, int maxLiteralIndex) {
-    counter = 0;
-    vector <Disjunctor*> v;
-    addNUniqDisjToList(v, disjCount, maxLiteralIndex);
-    print(v);
-    cout << isResolvable(0, disjCount - 1, v) << endl;
-    return counter;
-}
-
-
 int main() {
     srand(time(0));
-
-
-    cout << doTest(10000, 10000) << endl;
-
+    LOG_N = (int)floor(log2(10));
+    vector <pair<int, int>> v;
+    set <pair<int, int>> s;
+    addNUniqDisjToList(v, s, 10, 10);
+    counter = 0;
+    cout << isResolvable(0, 9, v, s) << endl;
+    cout << counter << endl;
     return 0;
 }
 
