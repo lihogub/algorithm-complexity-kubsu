@@ -3,6 +3,8 @@
 #include <vector>
 using namespace std;
 typedef u_int64_t ULL;
+typedef int64_t LL;
+
 
 bool numbers[1000000] = {0};
 int primes[1000000] = {0};
@@ -79,8 +81,9 @@ ULL getPublicKey(ULL k) {
     return 0;
 }
 
-ULL getPrivateKey(ULL publicKey, ULL k) {
-    return fastModExp(publicKey, k-2, k);
+LL getPrivateKey(LL publicKey, LL k) {
+	if (publicKey == 1) return 1;
+	return (1 - getPrivateKey(k % publicKey, publicKey) * k) / publicKey + k;
 }
 
 ULL encrypt(ULL plainText, ULL openKey, int n) {
@@ -91,41 +94,42 @@ ULL decrypt(ULL cypherText, ULL closeKey, int n) {
     return fastModExp(cypherText, closeKey, n);
 }
 
+pair<ULL, ULL> createKeyPair();
+
 int main() {
 
-    generatePrimes(1, 200000);
+    generatePrimes(46000, 56000);
     //printPrimes();
 
 
-    ULL a = getPrime(10);
-    cout << "a " << a << endl;
-
-    ULL b = getPrime(11);
-    cout << "b " << b << endl;
-
+    ULL a = getPrime(1);
+    ULL b = getPrime(5);
     ULL n = getN(a, b);
-    cout << "n " << n << endl;
-
     ULL k = getK(a, b);
-    cout << "k " << k << endl;
-
-    ULL open = getPublicKey(k);
-    cout << "open " << open << endl;
-
+    ULL open = 65537;
+    //ULL open = getPublicKey(k);
     ULL close = getPrivateKey(open, k);
+
+    cout << "a " << a << endl;
+    cout << "b " << b << endl;
+    cout << "n " << n << endl;
+    cout << "k " << k << endl;
+    cout << "open " << open << endl;
     cout << "close " << close << endl;
 
-    /*
-    char buf[8] = {0};
-    buf[0] = 'a';
-    buf[1] = 'a';
+    
+    int buf[8] = {0};
+    buf[0] = 127;
+    buf[1] = 127;
+    buf[2] = 127;
+    buf[3] = 127;
 
-    ULL plainText = stringToULL(buf);
+
+    ULL plainText = stringToULL((char*)buf);
     cout << plainText << endl;
-*/
 
-
-    ULL plainText = 123;
+    //ULL plainText = 123456789;
+    
     ULL cypherText = encrypt(plainText, open, n);
     cout << cypherText << endl;
     plainText = decrypt(cypherText, close, n);
