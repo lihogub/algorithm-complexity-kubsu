@@ -94,11 +94,10 @@ ULL decrypt(ULL cypherText, ULL closeKey, int n) {
     return fastModExp(cypherText, closeKey, n);
 }
 
-pair<ULL, ULL> createKeyPair();
 
 int main() {
 
-    generatePrimes(46000, 56000);
+    generatePrimes(46250, 56000);
     //printPrimes();
 
 
@@ -118,22 +117,15 @@ int main() {
     cout << "close " << close << endl;
 
     
-    int buf[8] = {0};
-    buf[0] = 127;
-    buf[1] = 127;
-    buf[2] = 127;
-    buf[3] = 127;
-
-
-    ULL plainText = stringToULL((char*)buf);
-    cout << plainText << endl;
-
-    //ULL plainText = 123456789;
+    //ULL plainText = stringToULL((char*)buf);
+   
+    ULL plainText = 1073741824;
+    cout << "plaintext: " << plainText << endl;
     
     ULL cypherText = encrypt(plainText, open, n);
-    cout << cypherText << endl;
+    cout << "cyphertext: " << cypherText << endl;
     plainText = decrypt(cypherText, close, n);
-    cout << plainText << endl;
+    cout << "plaintext: " << plainText << endl;
 
 
 
