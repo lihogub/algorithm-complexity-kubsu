@@ -36,7 +36,24 @@ unsigned int findMultInverse(unsigned int number, unsigned int prime) {
 }
 
 unsigned int getPrimeGreaterThan(int X) {
-    return 1213;
+    int upperLimit = X + (X/10);
+    bool* numbers = new bool[upperLimit];
+    for (int i = 2; i < upperLimit; i++) {
+        numbers[i] = false;
+    }
+    int s = floor(sqrt(X));
+    for (int i = 2; i <= s; i++) {
+        if (numbers[i]) 
+            continue;
+        for (int m = 2; i*m < upperLimit; m++) {
+            numbers[i*m] = true;
+        }
+    }
+    for (int i = ((X + upperLimit) / 2); i < upperLimit; i++) {
+        if (!numbers[i]) 
+            return i;
+    }
+    return 0;
 }
 
 unsigned int* getPolinomeCoefsArray(unsigned int m, unsigned int p, unsigned int X) {
@@ -111,6 +128,10 @@ unsigned int getLagrangeComponent(unsigned int i, vector<secretData> secretDataV
     return makePositiveByModulo(topValue, modulo)*findMultInverse(makePositiveByModulo(botValue, modulo), modulo);
 }
 
+vector<secretData> encodeSecret(unsigned int m, unsigned int n, unsigned int X) {
+    return getSplittedSecretVector(m, n, X);
+}
+
 unsigned int decodeSecret(vector<secretData> secretDataVector) {
     unsigned int prime = secretDataVector[0].p;
     unsigned int keepersNeeded = secretDataVector[0].m;
@@ -122,22 +143,19 @@ unsigned int decodeSecret(vector<secretData> secretDataVector) {
 }
 
 int main(int argc, const char** args) {
-/*
-    unsigned int arg1 = atoi(args[1]);
-    unsigned int arg2 = atoi(args[2]);
-    cout << findMultInverse(arg1, arg2) << endl;
-
-
-    cout << makePositiveByModulo(-7, 1213) << endl;
-*/
-    vector<secretData> secretDataVector = getSplittedSecretVector(5, 6, 555);
-    showSecretDataVector(secretDataVector);
-    secretDataVector.pop_back();
-
+    unsigned int m, n, secret;
+    cout << "Enter secret number: ";
+    cin >> secret;
+    cout << "Enter segments count: ";
+    cin >> n;
+    cout << "Enter segments count to decrypt: ";
+    cin >> m;
+    vector<secretData> encryptedSecret = encodeSecret(m, n, secret);
     
-    cout << decodeSecret(secretDataVector) << endl;
+    cout << "Segments: " << endl; 
+    showSecretDataVector(encryptedSecret);
 
-
+    cout << "Decoded secret: " << decodeSecret(encryptedSecret) << endl;
 
     return 0;
 }
