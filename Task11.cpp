@@ -151,11 +151,8 @@ int main(int argc, const char** args) {
     cout << "Enter segments count to decrypt: ";
     cin >> m;
     vector<secretData> encryptedSecret = encodeSecret(m, n, secret);
-    
     cout << "Segments: " << endl; 
     showSecretDataVector(encryptedSecret);
-
     cout << "Decoded secret: " << decodeSecret(encryptedSecret) << endl;
-
     return 0;
 }
