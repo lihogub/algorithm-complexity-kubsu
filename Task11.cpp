@@ -14,6 +14,8 @@ struct secretData {
 };
 
 
+
+
 unsigned int fastpowmod(unsigned int a, unsigned int n, unsigned int m) {
     unsigned int result = 1;
     unsigned int tmp = a;
@@ -27,6 +29,10 @@ unsigned int fastpowmod(unsigned int a, unsigned int n, unsigned int m) {
         n /= 2;
     }
     return result;
+}
+
+unsigned int findMultInverse(unsigned int number, unsigned int prime) {
+    return fastpowmod(number, prime-2, prime);
 }
 
 unsigned int getPrimeGreaterThan(int X) {
@@ -80,15 +86,58 @@ void showPolinome(unsigned int* coefsArray, unsigned int size) {
     cout << endl;
 }
 
-int main(int argc, const char** args) {
+unsigned int makePositiveByModulo(int number, int modulo) {
+    if (number < 0) {
+        return (unsigned int)(modulo + (number % modulo));
+    } else {
+        return (unsigned int)number;
+    }
+}
 
+unsigned int getLagrangeComponent(unsigned int i, vector<secretData> secretDataVector) {
+    int topValue = 1;
+    int botValue = 1;
+    int m = secretDataVector[0].m;
+    int modulo = secretDataVector[0].p;
+    int excluded = secretDataVector[i-1].i;
+    for (int k = 1; k <= m; k++) {
+        int secretDataNumber = secretDataVector[k-1].i;
+        if (secretDataNumber != excluded) {
+            topValue *= -secretDataNumber;
+            botValue *= i - secretDataNumber;
+        }
+    }
+
+    return makePositiveByModulo(topValue, modulo)*findMultInverse(makePositiveByModulo(botValue, modulo), modulo);
+}
+
+unsigned int decodeSecret(vector<secretData> secretDataVector) {
+    unsigned int prime = secretDataVector[0].p;
+    unsigned int keepersNeeded = secretDataVector[0].m;
+    unsigned int summary = 0;
+    for (int keeper = 1; keeper <= keepersNeeded; keeper++) {
+        summary += secretDataVector[keeper-1].y * getLagrangeComponent(keeper, secretDataVector);
+    }
+    return summary % prime;
+}
+
+int main(int argc, const char** args) {
+/*
     unsigned int arg1 = atoi(args[1]);
     unsigned int arg2 = atoi(args[2]);
-    unsigned int arg3 = atoi(args[3]);
-    cout << fastpowmod(arg1, arg2, arg3) << endl;
-/*
-    vector<secretData> secretDataVector = getSplittedSecretVector(2, 10, 555);
-    showSecretDataVector(secretDataVector);
+    cout << findMultInverse(arg1, arg2) << endl;
+
+
+    cout << makePositiveByModulo(-7, 1213) << endl;
 */
+    vector<secretData> secretDataVector = getSplittedSecretVector(5, 6, 555);
+    showSecretDataVector(secretDataVector);
+    secretDataVector.pop_back();
+
+    
+    cout << decodeSecret(secretDataVector) << endl;
+
+
+
     return 0;
 }
